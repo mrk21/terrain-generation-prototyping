@@ -1,0 +1,3 @@
+[submodule "vendor/libnoise"]
+	path = vendor/libnoise
+	url = https://github.com/qknight/libnoise.git
