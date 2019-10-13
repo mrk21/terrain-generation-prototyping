@@ -1,5 +1,5 @@
 cmake_minimum_required(VERSION 3.10.0 FATAL_ERROR)
-project(terrain-prototyping)
+project(terrain-generation-prototyping)
 
 # -----------------------------------------------------------------------------
 # compiler settings
@@ -9,7 +9,7 @@ if(CMAKE_CXX_COMPILER_ID STREQUAL AppleClang)
     message(FATAL_ERROR "A supported AppleClang version is greater than or equal to 10.0!")
   endif()
 
-  add_compile_options(-std=c++17 -stdlib=libc++ -Wall -Wextra)
+  add_compile_options(-std=c++17 -stdlib=libc++ -Wall -Wextra -Wno-deprecated-declarations)
   set(CMAKE_EXE_LINKER_FLAGS -stdlib=libc++)
   set(VENDOR_CXX_FLAGS -stdlib=libc++)
 
@@ -21,6 +21,13 @@ endif()
 # init submodules
 # -----------------------------------------------------------------------------
 execute_process(COMMAND git submodule update --init --recursive WORKING_DIRECTORY ${PROJECT_SOURCE_DIR})
+
+# -----------------------------------------------------------------------------
+# find packages
+# -----------------------------------------------------------------------------
+find_package(OpenCV REQUIRED)
+find_package(OpenGL REQUIRED)
+find_package(glfw3 REQUIRED)
 
 # -----------------------------------------------------------------------------
 # helpers

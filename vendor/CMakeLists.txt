@@ -37,15 +37,18 @@ append_project_var(vendor_product_LIBRARIES
 
 install(DIRECTORY ${INSTALL_DIR}/include DESTINATION .)
 install(DIRECTORY ${INSTALL_DIR}/lib DESTINATION .)
-find_package( REQUIRED)
 
 ## OpenCV
-find_package(OpenCV REQUIRED)
 set_property(
   DIRECTORY ${PROJECT_SOURCE_DIR}
   APPEND PROPERTY LINK_DIRECTORIES
     ${OpenCV_INSTALL_PATH}/lib
 )
-add_library(lib_opencv SHARED IMPORTED)
 append_project_var(vendor_product_INCLUDE_DIRS ${OpenCV_INCLUDE_DIRS})
 append_project_var(vendor_product_LIBRARIES ${OpenCV_LIBRARIES})
+
+## OpenGL
+append_project_var(vendor_product_LIBRARIES ${OPENGL_LIBRARIES})
+
+## GLFW
+append_project_var(vendor_product_LIBRARIES glfw)
