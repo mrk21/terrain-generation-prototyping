@@ -2,6 +2,7 @@
 #include <cmath>
 #include <random>
 #include <vector>
+#include <array>
 #include <algorithm>
 
 #include <noise/noise.h>
@@ -19,7 +20,7 @@ double threshold(double v, double t, double l, double u) {
     return v < t ? l : u;
 }
 
-using Vertices = std::vector<std::vector<GLdouble>>;
+using Vertices = std::vector<std::array<GLfloat, 3>>;
 
 class NoiseGenerator {
 public:
@@ -54,7 +55,7 @@ public:
                     v = clamp(v, -1.0, 1.0);
                     v = threshold(std::abs(v), 0.1, 0.0, 1.0);
                     if (v == 0.0) {
-                        vertices.push_back({ static_cast<GLdouble>(x), static_cast<GLdouble>(y), static_cast<GLdouble>(z) });
+                        vertices.push_back({ static_cast<GLfloat>(x), static_cast<GLfloat>(y), static_cast<GLfloat>(z) });
                     }
                 }
             }
@@ -112,7 +113,7 @@ public:
     }
 };
 
-class BoxcelMap {
+class VoxelMap {
 public:
     void draw(const Vertices & vertices) {
         Cube cube;
@@ -143,7 +144,7 @@ int main() {
 
     NoiseGenerator noise(200, 200, 200);
     Vertices vertices = noise.generate();
-    BoxcelMap boxcel_map;
+    VoxelMap voxel_map;
 
     const GLfloat light_color[] = { 0.2f, 0.2f, 0.8f, 1.0f };
     const GLfloat light0_pos[] = {
@@ -186,12 +187,15 @@ int main() {
             0.0, 0.0, 1.0
         );
 
+        GLfloat m[16];
+        glGetFloatv(GL_MODELVIEW_MATRIX, m);
+
         // lighting
         glLightfv(GL_LIGHT0, GL_POSITION, light0_pos);
         glLightfv(GL_LIGHT1, GL_POSITION, light1_pos);
 
         // draw
-        boxcel_map.draw(vertices);
+        voxel_map.draw(vertices);
 
         glfwSwapBuffers(window);
         glfwPollEvents();

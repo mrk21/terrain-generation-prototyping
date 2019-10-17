@@ -13,6 +13,10 @@ add_dependencies(vendor_develop vendor_product)
 # -----------------------------------------------------------------------------
 # Libraries
 # -----------------------------------------------------------------------------
+## boost
+append_project_var(vendor_product_INCLUDE_DIRS ${Boost_INCLUDE_DIRS})
+append_project_var(vendor_product_LIBRARIES ${Boost_LIBRARIES})
+
 ## libnoise
 ExternalProject_Add(libnoise
   SOURCE_DIR ${PROJECT_SOURCE_DIR}/vendor/libnoise
@@ -49,6 +53,10 @@ append_project_var(vendor_product_LIBRARIES ${OpenCV_LIBRARIES})
 
 ## OpenGL
 append_project_var(vendor_product_LIBRARIES ${OPENGL_LIBRARIES})
+
+## GLM
+append_project_var(vendor_product_INCLUDE_DIRS ${glm_INCLUDE_DIRS})
+append_project_var(vendor_product_LIBRARIES ${glm_LIBRARIES})
 
 ## GLFW
 append_project_var(vendor_product_LIBRARIES glfw)

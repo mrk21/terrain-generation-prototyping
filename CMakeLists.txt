@@ -25,9 +25,11 @@ execute_process(COMMAND git submodule update --init --recursive WORKING_DIRECTOR
 # -----------------------------------------------------------------------------
 # find packages
 # -----------------------------------------------------------------------------
+find_package(Boost COMPONENTS system filesystem REQUIRED)
 find_package(OpenCV REQUIRED)
 find_package(OpenGL REQUIRED)
 find_package(glfw3 REQUIRED)
+find_package(glm REQUIRED)
 
 # -----------------------------------------------------------------------------
 # helpers

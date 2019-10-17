@@ -1,4 +1,4 @@
-file(GLOB SRCS "*.cpp")
+file(GLOB SRCS "**.cpp" "*/**.cpp")
 
 foreach(f ${SRCS})
   get_filename_component(bf ${f} NAME_WE)
