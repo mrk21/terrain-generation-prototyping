@@ -4,13 +4,13 @@
 #include <noise/noise.h>
 #include <lib/voxel_renderer/voxel_renderer.hpp>
 
-class NoiseGenerator {
+class CaveGenerator {
 public:
     uint32_t x_length;
     uint32_t y_length;
     uint32_t z_length;
 
-    NoiseGenerator(uint32_t x_length_, uint32_t y_length_, uint32_t z_length_):
+    CaveGenerator(uint32_t x_length_, uint32_t y_length_, uint32_t z_length_):
         x_length(x_length_),
         y_length(y_length_),
         z_length(z_length_)
@@ -18,10 +18,10 @@ public:
 
     float value_to_angle(float value) {
         static const auto pi = boost::math::constants::pi<float>();
-        return value * pi / 160.0f;
+        return value * pi / 16.0f;
     }
 
-    VoxelRender::Vertices generate() {
+    VoxelRender::Vertices generate(uint32_t cave_size) {
         VoxelRender::Vertices vertices;
         std::random_device rand_u32;
         std::mt19937 mt{ rand_u32() };
@@ -31,20 +31,20 @@ public:
 
         noise::module::Perlin perlin;
         perlin.SetSeed(static_cast<int32_t>(rand_u32()));
-        perlin.SetOctaveCount(4);
-        perlin.SetFrequency(10.0f);
+        perlin.SetOctaveCount(3);
+        perlin.SetFrequency(4.0f);
 
         auto xy_length = std::min(x_length, y_length);
 
-        Helpers::times(5, [&](auto){
+        Helpers::times(cave_size / 2, [&](auto){
             uint32_t ox = rx(mt);
             uint32_t oy = ry(mt);
             uint32_t oz = rz(mt);
 
             std::vector<float> x_points;
-            for (uint32_t x = 0; x < xy_length; ++x) {
+            for (uint32_t x = ox; x < xy_length + ox; ++x) {
                 float v = perlin.GetValue(
-                    1.0 * (ox + x) / (xy_length + ox),
+                    1.0 *  x / xy_length,
                     1.0 * oy / xy_length,
                     1.0 * oz / z_length
                 );
@@ -53,28 +53,22 @@ public:
             }
 
             std::vector<float> y_points;
-            for (uint32_t y = 0; y < xy_length; ++y) {
+            for (uint32_t y = oy; y < xy_length + oy; ++y) {
                 float v = perlin.GetValue(
                     1.0 * ox / xy_length,
-                    1.0 * (oy + y) / (xy_length + oy),
+                    1.0 *  y / xy_length,
                     1.0 * oz / z_length
                 );
                 v = Helpers::clamp(v, -1.0f, 1.0f);
                 y_points.push_back(v);
             }
 
-            glm::mat4 mat(1.0f);
-            glm::vec3 base({ ox, oy, oz });
-            glm::vec4 origin({ 0, 0, 0, 1 });
-
             for (uint32_t x = 0; x < xy_length; ++x) {
-                mat =
+                auto mat =
                     glm::rotate(value_to_angle(y_points[x]), glm::vec3(1.0f, 0.0f, 0.0f)) *
-                    glm::rotate(value_to_angle(x_points[x]), glm::vec3(0.0f, 0.0f, 1.0f)) *
-                    glm::translate(glm::vec3(1, 0, 0)) *
-                    mat
+                    glm::rotate(value_to_angle(x_points[x]), glm::vec3(0.0f, 0.0f, 1.0f))
                 ;
-                auto vec = glm::translate(base) * mat * origin;
+                auto vec =  mat * glm::vec4(ox + x, oy, oz, 1.0f);
 
                 for (int32_t x = -4; x <= 4; ++x) {
                     for (int32_t y = -4; y <= 4; ++y) {
@@ -90,15 +84,15 @@ public:
             }
         });
 
-        Helpers::times(5, [&](auto){
+        Helpers::times(cave_size / 2, [&](auto){
             uint32_t ox = rx(mt);
             uint32_t oy = ry(mt);
             uint32_t oz = rz(mt);
 
             std::vector<float> x_points;
-            for (uint32_t x = 0; x < xy_length; ++x) {
+            for (uint32_t x = ox; x < xy_length + ox; ++x) {
                 float v = perlin.GetValue(
-                    1.0 * (ox + x) / (xy_length + ox),
+                    1.0 *  x / xy_length,
                     1.0 * oy / xy_length,
                     1.0 * oz / z_length
                 );
@@ -107,28 +101,22 @@ public:
             }
 
             std::vector<float> y_points;
-            for (uint32_t y = 0; y < xy_length; ++y) {
+            for (uint32_t y = oy; y < xy_length + oy; ++y) {
                 float v = perlin.GetValue(
                     1.0 * ox / xy_length,
-                    1.0 * (oy + y) / (xy_length + oy),
+                    1.0 *  y / xy_length,
                     1.0 * oz / z_length
                 );
                 v = Helpers::clamp(v, -1.0f, 1.0f);
                 y_points.push_back(v);
             }
 
-            glm::mat4 mat(1.0f);
-            glm::vec3 base({ ox, oy, oz });
-            glm::vec4 origin({ 0, 0, 0, 1 });
-
             for (uint32_t y = 0; y < xy_length; ++y) {
-                mat =
+                auto mat =
                     glm::rotate(value_to_angle(y_points[y]), glm::vec3(0.0f, 1.0f, 0.0f)) *
-                    glm::rotate(value_to_angle(x_points[y]), glm::vec3(0.0f, 0.0f, 1.0f)) *
-                    glm::translate(glm::vec3(0, 1, 0)) *
-                    mat
+                    glm::rotate(value_to_angle(x_points[y]), glm::vec3(0.0f, 0.0f, 1.0f))
                 ;
-                auto vec = glm::translate(base) * mat * origin;
+                auto vec = mat * glm::vec4(ox, oy + y, oz, 1.0f);
 
                 for (int32_t x = -4; x <= 4; ++x) {
                     for (int32_t y = -4; y <= 4; ++y) {
@@ -153,15 +141,15 @@ public:
 
 int main() {
     try {
-        auto window = GLHelpers::init("perlin noise 3d");
+        auto window = GLHelpers::init("perlin worms 3d");
         VoxelRender::Renderer renderer;
         renderer.init(window);
 
-        NoiseGenerator noise(200, 200, 200);
-        auto vertices = noise.generate();
+        CaveGenerator cave(400, 400, 400);
+        auto vertices = cave.generate(13u);
         std::cout << "vertex count: " << vertices.size() << std::endl;
 
-        renderer.render(vertices, { noise.x_length, noise.y_length, noise.z_length });
+        renderer.render(vertices, { cave.x_length, cave.y_length, cave.z_length });
         return 0;
     }
     catch (std::string str) {
