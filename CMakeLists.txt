@@ -48,4 +48,5 @@ endmacro()
 # -----------------------------------------------------------------------------
 include_directories(${PROJECT_SOURCE_DIR})
 add_subdirectory(vendor)
+add_subdirectory(lib)
 add_subdirectory(src)

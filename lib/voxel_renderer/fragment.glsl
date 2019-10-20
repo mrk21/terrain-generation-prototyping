@@ -19,7 +19,7 @@ void main(void) {
     vec3 half_vector = normalize(inv_light + inv_eye);
 
     float diffuse = clamp(dot(inv_light, face_normal), 0.1, 1.0);
-    float specular = pow(clamp(dot(half_vector, face_normal), 0.0, 1.0), 5.0);
+    float specular = pow(clamp(dot(half_vector, face_normal), 0.0, 1.0), 8.0);
     vec3 dest = face_color.rgb * diffuse + specular + ambient_color.rgb;
 
     color = vec4(dest, face_color.a);
