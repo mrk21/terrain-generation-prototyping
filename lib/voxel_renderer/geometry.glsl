@@ -2,7 +2,7 @@
 
 layout(points) in;
 layout(triangle_strip, max_vertices = 36) out;
-out vec3 f_color;
+out vec3 face_normal;
 
 uniform mat4 mvp;
 
@@ -25,17 +25,14 @@ void main(void) {
         7,4,3, 7,3,2,
         4,7,6, 4,6,5
     );
-    vec3[6] colors = vec3[](
-        vec3(0.0),
-        vec3(0.1),
-        vec3(0.2),
-        vec3(0.4),
-        vec3(0.6),
-        vec3(0.8)
-    );
 
     for (int i=0; i<6; i++) {
-        f_color = colors[i];
+        vec3 v0 = vertices[faces[i*6 + 0]];
+        vec3 v1 = vertices[faces[i*6 + 1]];
+        vec3 v2 = vertices[faces[i*6 + 2]];
+        vec3 vv1 = v1 - v0;
+        vec3 vv2 = v2 - v1;
+        face_normal = normalize(cross(vv1, vv2));
 
         for (int j=0; j<3; j++) {
             gl_Position = mvp * (gl_in[0].gl_Position + vec4(vertices[faces[j + i*6]], 0.0));

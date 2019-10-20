@@ -1,3 +1,3 @@
-# perlin noise 03
+# perlin worms 03
 
 ![snapshot](./doc/snapshot.png)

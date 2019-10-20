@@ -25,8 +25,8 @@ public:
         z_length(z_length_)
     {}
 
-    VoxelRender::Vertices generate() {
-        VoxelRender::Vertices vertices;
+    VoxelRenderer::Vertices generate() {
+        VoxelRenderer::Vertices vertices;
         noise::module::Perlin perlin;
         std::random_device rand_u32;
         perlin.SetSeed(static_cast<int32_t>(rand_u32()));
@@ -63,7 +63,7 @@ public:
 int main() {
     try {
         auto window = GLHelpers::init("perlin noise 3d");
-        VoxelRender::Renderer renderer;
+        VoxelRenderer::Renderer renderer;
         renderer.init(window);
 
         NoiseGenerator noise(100, 100, 100);

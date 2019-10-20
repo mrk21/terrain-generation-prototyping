@@ -13,7 +13,7 @@
 
 #include <lib/gl_helpers.hpp>
 
-namespace VoxelRender {
+namespace VoxelRenderer {
     using Vertices = std::vector<std::array<GLfloat, 3>>;
 
     struct ShaderInfo {
@@ -25,6 +25,10 @@ namespace VoxelRender {
 
         struct {
             GLuint mvp_location;
+            GLuint inv_mvp_location;
+            GLuint light_direction_location;
+            GLuint camera_position_location;
+            GLuint camera_target_location;
         } uniform;
     };
 
@@ -45,6 +49,10 @@ namespace VoxelRender {
 
             info.attribute.position_location = glGetAttribLocation(info.id, "position");
             info.uniform.mvp_location = glGetUniformLocation(info.id, "mvp");
+            info.uniform.inv_mvp_location = glGetUniformLocation(info.id, "inv_mvp");
+            info.uniform.light_direction_location = glGetUniformLocation(info.id, "light_direction");
+            info.uniform.camera_position_location = glGetUniformLocation(info.id, "camera_position");
+            info.uniform.camera_target_location = glGetUniformLocation(info.id, "camera_target");
 
             return info;
         }
@@ -113,14 +121,26 @@ namespace VoxelRender {
             glGenVertexArrays(1, vao);
         }
 
-        void bind_params(const ShaderInfo & info, const glm::mat4 & mvp) {
+        void bind_params(
+            const ShaderInfo & info,
+            const glm::mat4 & mvp,
+            const glm::vec3 & light_direction,
+            const glm::vec3 & camera_position,
+            const glm::vec3 & camera_target
+        ) {
             glBindVertexArray(vao[0]);
             {
                 glBindBuffer(GL_ARRAY_BUFFER, vbo[0]);
                 glEnableVertexAttribArray(0);
 
                 glVertexAttribPointer(info.attribute.position_location, 3, GL_FLOAT, GL_FALSE, 0, nullptr);
+
+                glm::mat4 inv_mvp = glm::inverse(mvp);
                 glUniformMatrix4fv(info.uniform.mvp_location, 1, GL_FALSE, &mvp[0][0]);
+                glUniformMatrix4fv(info.uniform.inv_mvp_location, 1, GL_FALSE, &inv_mvp[0][0]);
+                glUniformMatrix4fv(info.uniform.light_direction_location, 1, GL_FALSE, &light_direction[0]);
+                glUniformMatrix4fv(info.uniform.camera_position_location, 1, GL_FALSE, &camera_position[0]);
+                glUniformMatrix4fv(info.uniform.camera_target_location, 1, GL_FALSE, &camera_target[0]);
             }
         }
     };
@@ -163,9 +183,12 @@ namespace VoxelRender {
                     0.1f,
                     2000.0f
                 );
+                glm::vec3 light_direction(-1.0f, -2.0f, 2.0f);
+                glm::vec3 camera_position(-2.0f * scale.x, -2.0f * scale.y, 2.0f * scale.z);
+                glm::vec3 camera_target(0.0f, 0.0f, 0.0f);
                 auto view = glm::lookAt(
-                    glm::vec3(-2.0f * scale.x, -2.0f * scale.y, 2.0f * scale.z),
-                    glm::vec3(0.0f, 0.0f, 0.0f),
+                    camera_position,
+                    camera_target,
                     glm::vec3(0.0f, 0.0f, 1.0f)
                 );
                 auto model =
@@ -174,7 +197,13 @@ namespace VoxelRender {
                 ;
                 auto mvp = projection * view * model;
 
-                binder.bind_params(shader_info, mvp);
+                binder.bind_params(
+                    shader_info,
+                    mvp,
+                    light_direction,
+                    camera_position,
+                    camera_target
+                );
                 glDrawArrays(GL_POINTS, 0, vertices.size() - 1);
                 animate();
 

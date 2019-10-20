@@ -21,8 +21,8 @@ public:
         return value * pi / 16.0f;
     }
 
-    VoxelRender::Vertices generate(uint32_t cave_size) {
-        VoxelRender::Vertices vertices;
+    VoxelRenderer::Vertices generate(uint32_t cave_size) {
+        VoxelRenderer::Vertices vertices;
         std::random_device rand_u32;
         std::mt19937 mt{ rand_u32() };
         std::uniform_int_distribution<uint32_t> rx(0u, x_length);
@@ -131,7 +131,7 @@ public:
                 }
             }
         });
-        std::sort(vertices.begin(), vertices.end());
+        std::cout << vertices.size() << std::endl;
         auto result = std::unique(vertices.begin(), vertices.end());
         vertices.erase(result, vertices.end());
 
@@ -142,11 +142,13 @@ public:
 int main() {
     try {
         auto window = GLHelpers::init("perlin worms 3d");
-        VoxelRender::Renderer renderer;
+        VoxelRenderer::Renderer renderer;
         renderer.init(window);
 
-        CaveGenerator cave(400, 400, 400);
-        auto vertices = cave.generate(13u);
+        CaveGenerator cave(200, 200, 200);
+        auto vertices = cave.generate(10u);
+        //CaveGenerator cave(100, 100, 100);
+        //auto vertices = cave.generate(5u);
         std::cout << "vertex count: " << vertices.size() << std::endl;
 
         renderer.render(vertices, { cave.x_length, cave.y_length, cave.z_length });

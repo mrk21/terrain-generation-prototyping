@@ -40,14 +40,14 @@ namespace Helpers {
     }
 
     template<typename T>
-    double clamp(T v, T l, T u) {
+    T clamp(T v, T l, T u) {
         if (v < l) return l;
         if (v > u) return u;
         return v;
     }
 
     template<typename T>
-    double threshold(T v, T t, T l, T u) {
+    T threshold(T v, T t, T l, T u) {
         return v < t ? l : u;
     }
 }
