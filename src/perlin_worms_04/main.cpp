@@ -147,8 +147,6 @@ int main() {
 
         CaveGenerator cave(200, 200, 200);
         auto vertices = cave.generate(10u);
-        //CaveGenerator cave(400, 400, 400);
-        //auto vertices = cave.generate(14u);
         std::cout << "vertex count: " << vertices.size() << std::endl;
 
         renderer.render(vertices, { cave.x_length, cave.y_length, cave.z_length });

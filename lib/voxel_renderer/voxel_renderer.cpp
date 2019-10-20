@@ -16,8 +16,9 @@ namespace VoxelRenderer {
         glLinkProgram(info.id);
 
         info.attribute.position_location = glGetAttribLocation(info.id, "position");
-        info.uniform.mvp_location = glGetUniformLocation(info.id, "mvp");
-        info.uniform.inv_mvp_location = glGetUniformLocation(info.id, "inv_mvp");
+        info.uniform.model_location = glGetUniformLocation(info.id, "model");
+        info.uniform.view_location = glGetUniformLocation(info.id, "view");
+        info.uniform.projection_location = glGetUniformLocation(info.id, "projection");
         info.uniform.light_direction_location = glGetUniformLocation(info.id, "light_direction");
         info.uniform.camera_position_location = glGetUniformLocation(info.id, "camera_position");
         info.uniform.camera_target_location = glGetUniformLocation(info.id, "camera_target");
@@ -85,7 +86,9 @@ namespace VoxelRenderer {
 
     void ShaderDataBinder::bind_params(
         const ShaderInfo & info,
-        const glm::mat4 & mvp,
+        const glm::mat4 & model,
+        const glm::mat4 & view,
+        const glm::mat4 & projection,
         const glm::vec3 & light_direction,
         const glm::vec3 & camera_position,
         const glm::vec3 & camera_target
@@ -97,9 +100,9 @@ namespace VoxelRenderer {
 
             glVertexAttribPointer(info.attribute.position_location, 3, GL_FLOAT, GL_FALSE, 0, nullptr);
 
-            glm::mat4 inv_mvp = glm::inverse(mvp);
-            glUniformMatrix4fv(info.uniform.mvp_location, 1, GL_FALSE, &mvp[0][0]);
-            glUniformMatrix4fv(info.uniform.inv_mvp_location, 1, GL_FALSE, &inv_mvp[0][0]);
+            glUniformMatrix4fv(info.uniform.model_location, 1, GL_FALSE, &model[0][0]);
+            glUniformMatrix4fv(info.uniform.view_location, 1, GL_FALSE, &view[0][0]);
+            glUniformMatrix4fv(info.uniform.projection_location, 1, GL_FALSE, &projection[0][0]);
             glUniformMatrix4fv(info.uniform.light_direction_location, 1, GL_FALSE, &light_direction[0]);
             glUniformMatrix4fv(info.uniform.camera_position_location, 1, GL_FALSE, &camera_position[0]);
             glUniformMatrix4fv(info.uniform.camera_target_location, 1, GL_FALSE, &camera_target[0]);
@@ -141,7 +144,7 @@ namespace VoxelRenderer {
                 0.1f,
                 2000.0f
             );
-            glm::vec3 light_direction(-1.0f, -2.0f, 2.0f);
+            glm::vec3 light_direction(0.0f, -1.0f, 0.0f);
             glm::vec3 camera_position(-2.0f * scale.x, -2.0f * scale.y, 2.0f * scale.z);
             glm::vec3 camera_target(0.0f, 0.0f, 0.0f);
             auto view = glm::lookAt(
@@ -153,11 +156,12 @@ namespace VoxelRenderer {
                 glm::rotate(theta, glm::vec3(0.0f, 0.0f, 1.0f)) *
                 glm::translate(glm::vec3(-0.5f * scale.x, -0.5f * scale.y, -0.5f * scale.z))
             ;
-            auto mvp = projection * view * model;
 
             binder.bind_params(
                 shader_info,
-                mvp,
+                model,
+                view,
+                projection,
                 light_direction,
                 camera_position,
                 camera_target

@@ -27,8 +27,9 @@ namespace VoxelRenderer {
         } attribute;
 
         struct {
-            GLuint mvp_location;
-            GLuint inv_mvp_location;
+            GLuint model_location;
+            GLuint view_location;
+            GLuint projection_location;
             GLuint light_direction_location;
             GLuint camera_position_location;
             GLuint camera_target_location;
@@ -55,7 +56,9 @@ namespace VoxelRenderer {
         void create_buffer(const Vertices & vertices);
         void bind_params(
             const ShaderInfo & info,
-            const glm::mat4 & mvp,
+            const glm::mat4 & model,
+            const glm::mat4 & view,
+            const glm::mat4 & projection,
             const glm::vec3 & light_direction,
             const glm::vec3 & camera_position,
             const glm::vec3 & camera_target

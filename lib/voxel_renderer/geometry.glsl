@@ -4,7 +4,9 @@ layout(points) in;
 layout(triangle_strip, max_vertices = 36) out;
 out vec3 face_normal;
 
-uniform mat4 mvp;
+uniform mat4 model;
+uniform mat4 view;
+uniform mat4 projection;
 
 void main(void) {
     vec3[8] vertices = vec3[](
@@ -25,13 +27,14 @@ void main(void) {
         7,4,3, 7,3,2,
         4,7,6, 4,6,5
     );
+    mat4 mvp = projection * view * model;
 
     for (int i=0; i<6; i++) {
         vec3 v0 = vertices[faces[i*6 + 0]];
         vec3 v1 = vertices[faces[i*6 + 1]];
         vec3 v2 = vertices[faces[i*6 + 2]];
         vec3 vv1 = v1 - v0;
-        vec3 vv2 = v2 - v1;
+        vec3 vv2 = v2 - v0;
         face_normal = normalize(cross(vv1, vv2));
 
         for (int j=0; j<3; j++) {
