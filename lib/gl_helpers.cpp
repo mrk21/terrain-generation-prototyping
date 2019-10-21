@@ -23,7 +23,7 @@ namespace GLHelpers {
         return window;
     }
 
-    auto dump(const glm::mat4 & m) {
+    boost::format dump(const glm::mat4 & m) {
         return boost::format(Helpers::trim_base_indent(R"(
             % 10.5f   % 10.5f   % 10.5f   % 10.5f
             % 10.5f   % 10.5f   % 10.5f   % 10.5f

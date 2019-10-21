@@ -134,7 +134,7 @@ int main() {
         std::cerr << "glfwInit failed." << std::endl;
         exit(EXIT_FAILURE);
     }
-    GLFWwindow * window = glfwCreateWindow(640, 480, "perlin worms 3d", nullptr, nullptr);
+    GLFWwindow * window = glfwCreateWindow(640, 480, "perlin worms 01", nullptr, nullptr);
     if (!window) {
         std::cerr << "glfwCreateWindow failed." << std::endl;
         glfwTerminate();

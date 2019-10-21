@@ -129,7 +129,7 @@ namespace VoxelRenderer {
         float theta = 0.0f;
         auto animate = [&theta]() {
             static const double pi = boost::math::constants::pi<double>();
-            theta += 0.5f * pi / 360.0f;
+            theta += 1.0f * pi / 360.0f;
         };
 
         while (glfwWindowShouldClose(window) == GL_FALSE) {
@@ -143,10 +143,11 @@ namespace VoxelRenderer {
                 glm::radians(30.0f),
                 1.0f * ww / wh,
                 0.1f,
-                2000.0f
+                10000.0f
             );
-            glm::vec3 light_direction(0.0f, -1.0f, 0.0f);
-            glm::vec3 camera_position(-2.0f * scale.x, -2.0f * scale.y, 2.0f * scale.z);
+            auto max = std::max(std::max(scale.x, scale.y), scale.z);
+            glm::vec3 light_direction(-0.5f, -1.0f, 0.0f);
+            glm::vec3 camera_position(-2.0f * max, -2.0f * max, 2.0f * max);
             glm::vec3 camera_target(0.0f, 0.0f, 0.0f);
             auto view = glm::lookAt(
                 camera_position,

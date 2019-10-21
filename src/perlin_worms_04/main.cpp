@@ -141,11 +141,11 @@ public:
 
 int main() {
     try {
-        auto window = GLHelpers::init("perlin worms 3d");
+        auto window = GLHelpers::init("perlin worms 04");
         VoxelRenderer::Renderer renderer;
         renderer.init(window);
 
-        CaveGenerator cave(200, 200, 200);
+        CaveGenerator cave(300, 300, 100);
         auto vertices = cave.generate(10u);
         std::cout << "vertex count: " << vertices.size() << std::endl;
 

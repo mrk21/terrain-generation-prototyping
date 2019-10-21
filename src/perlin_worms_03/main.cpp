@@ -62,11 +62,11 @@ public:
 
 int main() {
     try {
-        auto window = GLHelpers::init("perlin noise 3d");
+        auto window = GLHelpers::init("perlin noise 03");
         VoxelRenderer::Renderer renderer;
         renderer.init(window);
 
-        NoiseGenerator noise(100, 100, 100);
+        NoiseGenerator noise(200, 200, 200);
         auto vertices = noise.generate();
         std::cout << "vertex count: " << vertices.size() << std::endl;
 
