@@ -1,3 +1,4 @@
+#include <glm/gtc/type_ptr.hpp>
 #include <lib/voxel_renderer/voxel_renderer.hpp>
 
 namespace VoxelRenderer {
@@ -100,12 +101,12 @@ namespace VoxelRenderer {
 
             glVertexAttribPointer(info.attribute.position_location, 3, GL_FLOAT, GL_FALSE, 0, nullptr);
 
-            glUniformMatrix4fv(info.uniform.model_location, 1, GL_FALSE, &model[0][0]);
-            glUniformMatrix4fv(info.uniform.view_location, 1, GL_FALSE, &view[0][0]);
-            glUniformMatrix4fv(info.uniform.projection_location, 1, GL_FALSE, &projection[0][0]);
-            glUniformMatrix4fv(info.uniform.light_direction_location, 1, GL_FALSE, &light_direction[0]);
-            glUniformMatrix4fv(info.uniform.camera_position_location, 1, GL_FALSE, &camera_position[0]);
-            glUniformMatrix4fv(info.uniform.camera_target_location, 1, GL_FALSE, &camera_target[0]);
+            glUniformMatrix4fv(info.uniform.model_location, 1, GL_FALSE, glm::value_ptr(model));
+            glUniformMatrix4fv(info.uniform.view_location, 1, GL_FALSE, glm::value_ptr(view));
+            glUniformMatrix4fv(info.uniform.projection_location, 1, GL_FALSE, glm::value_ptr(projection));
+            glUniform3fv(info.uniform.light_direction_location, 1, glm::value_ptr(light_direction));
+            glUniform3fv(info.uniform.camera_position_location, 1, glm::value_ptr(camera_position));
+            glUniform3fv(info.uniform.camera_target_location, 1, glm::value_ptr(camera_target));
         }
     }
 
