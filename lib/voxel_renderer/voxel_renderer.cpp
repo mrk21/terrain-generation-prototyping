@@ -129,7 +129,7 @@ namespace VoxelRenderer {
         float theta = 0.0f;
         auto animate = [&theta]() {
             static const double pi = boost::math::constants::pi<double>();
-            theta += 1.0f * pi / 360.0f;
+            theta += 0.5f * pi / 360.0f;
         };
 
         while (glfwWindowShouldClose(window) == GL_FALSE) {

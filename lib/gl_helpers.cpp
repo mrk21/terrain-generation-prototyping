@@ -36,4 +36,12 @@ namespace GLHelpers {
             % m[3][0] % m[3][1] % m[3][2] % m[3][3]
         ;
     }
+
+    boost::format dump(const glm::vec3 & v) {
+        return boost::format(Helpers::trim_base_indent(R"(
+            (% 10.5f,   % 10.5f,   % 10.5f)
+        )"))
+            % v.x % v.y % v.z
+        ;
+    }
 }

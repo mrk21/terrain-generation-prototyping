@@ -32,7 +32,7 @@ const int[36] faces = int[](
 );
 
 mat4 mvp = projection * view * model;
-mat3 transpose_inverse_m = mat3(transpose(inverse(model)));
+mat3 transpose_inverse_m = transpose(inverse(mat3(model)));
 
 const vec4 ambient_color = vec4(0.1, 0.1, 0.1, 1.0);
 const vec4 face_color_base = vec4(0.5, 0.5, 0.5, 1.0);
@@ -63,11 +63,11 @@ void main(void) {
         vec3 vv2 = v2 - v0;
         vec3 face_normal = normalize(transpose_inverse_m * cross(vv1, vv2));
 
-        float face_diffuse = max(0, dot(light_direction, face_normal));
+        float face_diffuse = max(0, dot(normalize(light_direction), face_normal));
         float face_specular = pow(max(0, dot(half_vector, face_normal)), 8.0);
         face_color = face_color_base.rgb * face_diffuse + face_specular + ambient_color.rgb;
 
-        if (dot(face_normal, camera_direction) <= 0.0) {
+        if (dot(face_normal, camera_direction) < 0.0) {
             display_face(i);
         }
     }
