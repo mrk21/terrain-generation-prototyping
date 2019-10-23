@@ -71,7 +71,7 @@ namespace VoxelRenderer {
 
     public:
         void init(GLFWwindow * window_);
-        void render(const Vertices & vertices, const glm::vec3 & scale);
+        void render(const Vertices & vertices);
     };
 }
 

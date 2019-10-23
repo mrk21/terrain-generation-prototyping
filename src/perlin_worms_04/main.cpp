@@ -145,11 +145,11 @@ int main() {
         VoxelRenderer::Renderer renderer;
         renderer.init(window);
 
-        CaveGenerator cave(300, 300, 100);
+        CaveGenerator cave(300, 300, 300);
         auto vertices = cave.generate(10u);
         std::cout << "vertex count: " << vertices.size() << std::endl;
 
-        renderer.render(vertices, { cave.x_length, cave.y_length, cave.z_length });
+        renderer.render(vertices);
         return 0;
     }
     catch (std::string str) {

@@ -212,11 +212,11 @@ int main() {
         std::random_device rand_u32;
         auto seed = static_cast<int32_t>(rand_u32());
 
-        CaveGenerator cave(seed, 100u);
+        CaveGenerator cave(seed, 200u);
         auto vertices = cave.generate({ 0, 0 }, { 2, 2 });
         std::cout << "vertex count: " << vertices.size() << std::endl;
 
-        renderer.render(vertices, { 200, 200, 200 });
+        renderer.render(vertices);
         return 0;
     }
     catch (std::string str) {

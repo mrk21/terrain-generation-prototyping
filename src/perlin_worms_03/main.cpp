@@ -70,7 +70,7 @@ int main() {
         auto vertices = noise.generate();
         std::cout << "vertex count: " << vertices.size() << std::endl;
 
-        renderer.render(vertices, { noise.x_length, noise.y_length, noise.z_length });
+        renderer.render(vertices);
         return 0;
     }
     catch (std::string str) {

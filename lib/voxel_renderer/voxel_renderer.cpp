@@ -122,7 +122,20 @@ namespace VoxelRenderer {
         shader_info = builder.build();
     }
 
-    void Renderer::render(const Vertices & vertices, const glm::vec3 & scale) {
+    void Renderer::render(const Vertices & vertices) {
+        glm::vec3 min( 999999, 999999, 999999);
+        glm::vec3 max(-999999,-999999,-999999);
+        for (const auto & v: vertices) {
+            min.x = std::min(min.x, v[0]);
+            min.y = std::min(min.y, v[1]);
+            min.z = std::min(min.z, v[2]);
+
+            max.x = std::max(max.x, v[0]);
+            max.y = std::max(max.y, v[1]);
+            max.z = std::max(max.z, v[2]);
+        }
+        auto center = (min + max) / 2.0f;
+
         ShaderDataBinder binder;
         binder.create_buffer(vertices);
 
@@ -145,19 +158,17 @@ namespace VoxelRenderer {
                 0.1f,
                 10000.0f
             );
-            auto max = std::max(std::max(scale.x, scale.y), scale.z);
             glm::vec3 light_direction(-0.5f, -1.0f, 0.0f);
-            glm::vec3 camera_position(-2.0f * max, -2.0f * max, 2.0f * max);
+            glm::vec3 camera_position(-2.0f * max.x, -2.0f * max.x, 2.0f * max.z);
             glm::vec3 camera_target(0.0f, 0.0f, 0.0f);
             auto view = glm::lookAt(
                 camera_position,
                 camera_target,
                 glm::vec3(0.0f, 0.0f, 1.0f)
             );
-            auto model =
-                glm::rotate(theta, glm::vec3(0.0f, 0.0f, 1.0f)) *
-                glm::translate(glm::vec3(-0.5f * scale.x, -0.5f * scale.y, -0.5f * scale.z))
-            ;
+            glm::mat4 model(1.0f);
+            model *= glm::rotate(theta, glm::vec3(0.0f, 0.0f, 1.0f));
+            model *= glm::translate(-center);
 
             binder.bind_params(
                 shader_info,
