@@ -68,12 +68,11 @@ int main() {
 
         NoiseGenerator noise(200, 200, 200);
         auto vertices = noise.generate();
-        std::cout << "vertex count: " << vertices.size() << std::endl;
-
         renderer.render(vertices);
-        return 0;
     }
     catch (std::string str) {
         std::cerr << str << std::endl;
+        return 1;
     }
+    return 0;
 }

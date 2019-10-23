@@ -6,6 +6,7 @@
 #include <random>
 #include <vector>
 #include <map>
+#include <unordered_map>
 #include <array>
 #include <algorithm>
 #include <string>
@@ -63,6 +64,11 @@ namespace VoxelRenderer {
             const glm::vec3 & camera_position,
             const glm::vec3 & camera_target
         );
+    };
+
+    class VerticesOptimizer {
+    public:
+        VoxelRenderer::Vertices optimize(const VoxelRenderer::Vertices & vertices);
     };
 
     class Renderer {

@@ -110,6 +110,46 @@ namespace VoxelRenderer {
         }
     }
 
+// VerticesOptimizer
+
+    VoxelRenderer::Vertices VerticesOptimizer::optimize(const VoxelRenderer::Vertices & vertices) {
+        std::unordered_map<int32_t, std::unordered_map<int32_t, std::unordered_map<int32_t, glm::vec3>>> data;
+
+        for (const auto & v: vertices) {
+            auto x = static_cast<int32_t>(std::round(v[0]));
+            auto y = static_cast<int32_t>(std::round(v[1]));
+            auto z = static_cast<int32_t>(std::round(v[2]));
+            data[x][y][z] = glm::vec3(x,y,z);
+        }
+
+        VoxelRenderer::Vertices result;
+        uint32_t data_size = 0;
+
+        for (const auto & x: data) {
+            for (const auto & y: x.second) {
+                auto end = y.second.end();
+                data_size += y.second.size();
+                for (const auto & z: y.second) {
+                    if (
+                        data[x.first    ][y.first    ].find(z.first - 1) == end ||
+                        data[x.first    ][y.first    ].find(z.first + 1) == end ||
+                        data[x.first    ][y.first - 1].find(z.first    ) == end ||
+                        data[x.first    ][y.first + 1].find(z.first    ) == end ||
+                        data[x.first - 1][y.first    ].find(z.first    ) == end ||
+                        data[x.first + 1][y.first    ].find(z.first    ) == end
+                    ) {
+                        result.push_back({ z.second.x, z.second.y, z.second.z });
+                    }
+                }
+            }
+        }
+        std::cout << "Original vertex size: " << vertices.size() << std::endl;
+        std::cout << "Unique vertex size: " << data_size << std::endl;
+        std::cout << "Visible vertex size: " << result.size() << std::endl;
+
+        return result;
+    }
+
 // Renderer
 
     void Renderer::init(GLFWwindow * window_) {
@@ -122,7 +162,9 @@ namespace VoxelRenderer {
         shader_info = builder.build();
     }
 
-    void Renderer::render(const Vertices & vertices) {
+    void Renderer::render(const Vertices & vertices_) {
+        auto vertices = VerticesOptimizer().optimize(vertices_);
+
         glm::vec3 min( 999999, 999999, 999999);
         glm::vec3 max(-999999,-999999,-999999);
         for (const auto & v: vertices) {

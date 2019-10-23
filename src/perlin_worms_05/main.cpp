@@ -100,9 +100,6 @@ public:
             }
         }
 
-        auto result = std::unique(vertices.begin(), vertices.end());
-        vertices.erase(result, vertices.end());
-
         return vertices;
     }
 
@@ -214,12 +211,11 @@ int main() {
 
         CaveGenerator cave(seed, 200u);
         auto vertices = cave.generate({ 0, 0 }, { 2, 2 });
-        std::cout << "vertex count: " << vertices.size() << std::endl;
-
         renderer.render(vertices);
-        return 0;
     }
     catch (std::string str) {
         std::cerr << str << std::endl;
+        return 1;
     }
+    return 0;
 }
