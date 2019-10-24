@@ -114,12 +114,23 @@ namespace VoxelRenderer {
 
     VoxelRenderer::Vertices VerticesOptimizer::optimize(const VoxelRenderer::Vertices & vertices) {
         std::unordered_map<int32_t, std::unordered_map<int32_t, std::unordered_map<int32_t, glm::vec3>>> data;
+        auto is_nothing = [&data](int32_t x, int32_t y, int32_t z) {
+            if (data.find(x) == data.end()) return true;
+
+            const auto & data_x = data.at(x);
+            if (data_x.find(y) == data_x.end()) return true;
+
+            const auto & data_xy = data_x.at(y);
+            if (data_xy.find(z) == data_xy.end()) return true;
+
+            return false;
+        };
 
         for (const auto & v: vertices) {
             auto x = static_cast<int32_t>(std::round(v[0]));
             auto y = static_cast<int32_t>(std::round(v[1]));
             auto z = static_cast<int32_t>(std::round(v[2]));
-            data[x][y][z] = glm::vec3(x,y,z);
+            if (is_nothing(x,y,z)) data[x][y][z] = { x, y, z };
         }
 
         VoxelRenderer::Vertices result;
@@ -127,16 +138,15 @@ namespace VoxelRenderer {
 
         for (const auto & x: data) {
             for (const auto & y: x.second) {
-                auto end = y.second.end();
                 data_size += y.second.size();
                 for (const auto & z: y.second) {
                     if (
-                        data[x.first    ][y.first    ].find(z.first - 1) == end ||
-                        data[x.first    ][y.first    ].find(z.first + 1) == end ||
-                        data[x.first    ][y.first - 1].find(z.first    ) == end ||
-                        data[x.first    ][y.first + 1].find(z.first    ) == end ||
-                        data[x.first - 1][y.first    ].find(z.first    ) == end ||
-                        data[x.first + 1][y.first    ].find(z.first    ) == end
+                        is_nothing(x.first    , y.first    , z.first - 1) ||
+                        is_nothing(x.first    , y.first    , z.first + 1) ||
+                        is_nothing(x.first    , y.first - 1, z.first    ) ||
+                        is_nothing(x.first    , y.first + 1, z.first    ) ||
+                        is_nothing(x.first - 1, y.first    , z.first    ) ||
+                        is_nothing(x.first + 1, y.first    , z.first    )
                     ) {
                         result.push_back({ z.second.x, z.second.y, z.second.z });
                     }
