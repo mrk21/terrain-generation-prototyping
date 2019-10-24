@@ -87,8 +87,8 @@ public:
 
         noise::module::Perlin perlin;
         perlin.SetSeed(seed);
-        perlin.SetOctaveCount(6);
-        perlin.SetFrequency(1.0f);
+        perlin.SetOctaveCount(10);
+        perlin.SetFrequency(4.0f);
         std::cout << "Seed: " << seed << std::endl;
 
         CaveInfoGenerator generator(seed);
@@ -106,7 +106,7 @@ public:
 private:
     float value_to_angle(float value) {
         static const auto pi = boost::math::constants::pi<float>();
-        return value * pi / 6.0f;
+        return value * pi / 2.0f;
     }
 
     void generate_sub(const noise::module::Perlin & perlin, const CaveInfoGenerator & generator, const std::optional<CaveInfo> & info, VoxelRenderer::Vertices & vertices) {
@@ -138,64 +138,83 @@ private:
             h_lotations.push_back(v);
         }
 
-        glm::vec3 prev_vec = info->position;
-        uint32_t weight = 4u;
+        glm::vec3 current_position = info->position;
+        uint32_t weight = 8u;
+        float total_length = 0.0f;
 
         for (uint32_t i = 0; i < info->length; ++i) {
-            glm::mat4 mat(1.0f);
-            mat *= glm::rotate(value_to_angle(h_lotations[i]), info->h_rotation_axis);
-            mat *= glm::rotate(value_to_angle(w_rotations[i]), info->w_rotation_axis);
-            auto vec = glm::vec3(mat * glm::vec4(info->position + 1.0f * i * info->p_direction, 1.0f));
+            // calculate next position
+            glm::mat4 m(1.0f);
+            m *= glm::translate(current_position);
+            m *= glm::rotate(value_to_angle(h_lotations[i]), info->h_rotation_axis);
+            m *= glm::rotate(value_to_angle(w_rotations[i]), info->w_rotation_axis);
+            m *= glm::translate(info->p_direction);
+            m *= glm::translate(-current_position);
 
-            if (i % (info->length / 2) == 0) {
-                auto sub_info = generator.make_from_point(vec, info->length / 2);
-                generate_sub(perlin, generator, sub_info, vertices);
-            }
+            auto next_position = glm::vec3(m * glm::vec4(current_position, 1.0f));
+            auto distance = glm::length(next_position - current_position);
+            total_length += distance;
 
-            // lerp
+            // make walls
+            make_walls(next_position, vertices, weight);
+
+            // fill opening
             {
-                auto norm = std::floor(glm::length(vec - prev_vec));
+                uint32_t distance_i = std::ceil(distance);
 
-                for (uint32_t i = 0; i < norm; ++i) {
-                    auto t = 1.0f * i / norm;
-                    auto v = lerp(prev_vec, vec, t);
-                    make_blocks(v, vertices, weight);
+                if (distance_i > 0) {
+                    for (uint32_t ti = 0; ti <= distance_i; ++ti) {
+                        auto t = (1.0f * ti) / distance_i;
+                        auto v = lerp(current_position, next_position, t);
+                        make_walls(v, vertices, weight);
+                    }
                 }
             }
 
-            make_blocks(vec, vertices, weight);
-            prev_vec = vec;
+            // make branches
+            if (i % (info->length / 4) == 0) {
+                auto sub_info = generator.make_from_point(next_position, info->length / 2);
+                generate_sub(perlin, generator, sub_info, vertices);
+            }
+
+            current_position = next_position;
         }
+
+        std::cout << boost::format("%s's total length: %f") % GLHelpers::dump(info->position) % total_length << std::endl;
     }
 
-    void make_blocks(const glm::vec3 & vec, VoxelRenderer::Vertices & vertices, uint32_t weight) {
+    void make_walls(const glm::vec3 & position, VoxelRenderer::Vertices & vertices, uint32_t weight) {
         int32_t hw = weight / 2;
 
-        auto ox = std::round(vec.x);
-        auto oy = std::round(vec.y);
-        auto oz = std::round(vec.z);
+        auto ox = position.x;
+        auto oy = position.y;
+        auto oz = position.z;
 
+        /// xy planes
         for (int32_t x = -hw; x <= hw; ++x) {
             for (int32_t y = -hw; y <= hw; ++y) {
                 vertices.push_back({ ox + x, oy + y, oz - hw });
                 vertices.push_back({ ox + x, oy + y, oz + hw });
             }
         }
-        for (int32_t z = -hw; z <= hw; ++z) {
-            for (int32_t y = -hw; y <= hw; ++y) {
-                vertices.push_back({ ox - hw, oy + y, oz + z });
-                vertices.push_back({ ox + hw, oy + y, oz + z });
-            }
-        }
-        for (int32_t z = -hw; z <= hw; ++z) {
-            for (int32_t x = -hw; x <= hw; ++x) {
+        /// xz planes
+        for (int32_t x = -hw; x <= hw; ++x) {
+            for (int32_t z = -hw; z <= hw; ++z) {
                 vertices.push_back({ ox + x, oy - hw, oz + z });
                 vertices.push_back({ ox + x, oy + hw, oz + z });
+            }
+        }
+        /// yz planes
+        for (int32_t y = -hw; y <= hw; ++y) {
+            for (int32_t z = -hw; z <= hw; ++z) {
+                vertices.push_back({ ox - hw, oy + y, oz + z });
+                vertices.push_back({ ox + hw, oy + y, oz + z });
             }
         }
     }
 
     glm::vec3 lerp(const glm::vec3 & v1, const glm::vec3 & v2, float t) {
+        t = glm::clamp(t, 0.0f, 1.0f);
         return t * (v2 - v1) + v1;
     }
 };
@@ -209,8 +228,8 @@ int main() {
         std::random_device rand_u32;
         auto seed = static_cast<int32_t>(rand_u32());
 
-        CaveGenerator cave(seed, 200u);
-        auto vertices = cave.generate({ 0, 0 }, { 2, 2 });
+        CaveGenerator cave(seed, 400u);
+        auto vertices = cave.generate({ 0, 0 }, { 1, 1 });
         renderer.render(vertices);
     }
     catch (std::string str) {
