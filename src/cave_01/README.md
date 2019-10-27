@@ -1,3 +1,3 @@
-# perlin worms 04
+# cave 01
 
 ![snapshot](./doc/snapshot.png)

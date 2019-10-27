@@ -1,5 +1,6 @@
 add_subdirectory(perlin_worms_01)
 add_subdirectory(perlin_worms_02)
 add_subdirectory(perlin_worms_03)
-add_subdirectory(perlin_worms_04)
-add_subdirectory(perlin_worms_05)
+add_subdirectory(cave_01)
+add_subdirectory(cave_02)
+add_subdirectory(cave_wall_01)

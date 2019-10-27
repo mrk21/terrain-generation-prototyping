@@ -175,8 +175,16 @@ namespace VoxelRenderer {
     void Renderer::render(const Vertices & vertices_) {
         auto vertices = VerticesOptimizer().optimize(vertices_);
 
-        glm::vec3 min( 999999, 999999, 999999);
-        glm::vec3 max(-999999,-999999,-999999);
+        glm::vec3 min(
+            std::numeric_limits<float>::max(),
+            std::numeric_limits<float>::max(),
+            std::numeric_limits<float>::max()
+        );
+        glm::vec3 max(
+            std::numeric_limits<float>::min(),
+            std::numeric_limits<float>::min(),
+            std::numeric_limits<float>::min()
+        );
         for (const auto & v: vertices) {
             min.x = std::min(min.x, v[0]);
             min.y = std::min(min.y, v[1]);
@@ -211,7 +219,11 @@ namespace VoxelRenderer {
                 10000.0f
             );
             glm::vec3 light_direction(-0.5f, -1.0f, 0.0f);
-            glm::vec3 camera_position(-2.0f * max.x, -2.0f * max.x, 2.0f * max.z);
+            glm::vec3 camera_position(
+                -std::max(20.0f, 2.0f * max.x),
+                -std::max(20.0f, 2.0f * max.x),
+                 std::max(20.0f, 2.0f * max.z)
+            );
             glm::vec3 camera_target(0.0f, 0.0f, 0.0f);
             auto view = glm::lookAt(
                 camera_position,

@@ -188,7 +188,7 @@ private:
     }
 
     void make_walls(const glm::vec3 & position, VoxelRenderer::Vertices & vertices) {
-        int32_t r = base_radius / 2;
+        float r = base_radius / 2.0f;
 
         auto noise_v = [this](int32_t x, int32_t y, int32_t z) {
             float v = radius_noise.GetValue(
@@ -199,9 +199,9 @@ private:
             return base_radius * v;
         };
 
-        for (int32_t xi = -r; xi <= r; ++xi) {
-            for (int32_t yi = -r; yi <= r; ++yi) {
-                for (int32_t zi = -r; zi <= r; ++zi) {
+        for (int32_t xi = -std::floor(r); xi <= std::floor(r); ++xi) {
+            for (int32_t yi = -std::floor(r); yi <= std::floor(r); ++yi) {
+                for (int32_t zi = -std::floor(r); zi <= std::floor(r); ++zi) {
                     auto x = position.x + xi;
                     auto y = position.y + yi;
                     auto z = position.z + zi;
@@ -235,6 +235,8 @@ int main() {
         //auto seed = 660074508;
         //auto seed = -1419309244;
         //auto seed = 473924825;
+        //auto seed = 1577647858;
+        //auto seed = -272651747;
 
         std::cout << "Seed: " << seed << std::endl;
         CaveGenerator cave(seed, 400u);
