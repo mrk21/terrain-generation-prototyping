@@ -48,7 +48,7 @@ public:
                     1.0 * oy / xy_length,
                     1.0 * oz / z_length
                 );
-                v = Helpers::clamp(v, -1.0f, 1.0f);
+                v = glm::clamp(v, -1.0f, 1.0f);
                 x_points.push_back(v);
             }
 
@@ -59,7 +59,7 @@ public:
                     1.0 *  y / xy_length,
                     1.0 * oz / z_length
                 );
-                v = Helpers::clamp(v, -1.0f, 1.0f);
+                v = glm::clamp(v, -1.0f, 1.0f);
                 y_points.push_back(v);
             }
 
@@ -96,7 +96,7 @@ public:
                     1.0 * oy / xy_length,
                     1.0 * oz / z_length
                 );
-                v = Helpers::clamp(v, -1.0f, 1.0f);
+                v = glm::clamp(v, -1.0f, 1.0f);
                 x_points.push_back(v);
             }
 
@@ -107,7 +107,7 @@ public:
                     1.0 *  y / xy_length,
                     1.0 * oz / z_length
                 );
-                v = Helpers::clamp(v, -1.0f, 1.0f);
+                v = glm::clamp(v, -1.0f, 1.0f);
                 y_points.push_back(v);
             }
 

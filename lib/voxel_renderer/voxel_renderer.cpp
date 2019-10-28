@@ -221,7 +221,7 @@ namespace VoxelRenderer {
             glm::vec3 light_direction(-0.5f, -1.0f, 0.0f);
             glm::vec3 camera_position(
                 -std::max(20.0f, 2.0f * max.x),
-                -std::max(20.0f, 2.0f * max.x),
+                -std::max(20.0f, 2.0f * max.y),
                  std::max(20.0f, 2.0f * max.z)
             );
             glm::vec3 camera_target(0.0f, 0.0f, 0.0f);

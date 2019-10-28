@@ -16,8 +16,8 @@
 
 namespace GLHelpers {
     GLFWwindow * init(const std::string & title, GLuint width = 1280, GLuint height = 960);
-    boost::format dump(const glm::mat4 & m);
-    boost::format dump(const glm::vec3 & v);
+    std::string to_string(const glm::mat4 & m);
+    std::string to_string(const glm::vec3 & v);
 }
 
 #endif

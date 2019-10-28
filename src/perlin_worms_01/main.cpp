@@ -31,21 +31,21 @@ int main() {
     std::random_device rand_u32;
     perlin.SetSeed(static_cast<int32_t>(rand_u32()));
     perlin.SetOctaveCount(6);
-    perlin.SetFrequency(5.0);
+    perlin.SetFrequency(10.0f / 2000.0f);
 
     std::cout << "seed: " << perlin.GetSeed() << std::endl;
 
     for (uint32_t x = 0; x < x_length; ++x) {
         for (uint32_t y = 0; y < y_length; ++y) {
             double v = perlin.GetValue(
-                1.0 * x / x_length,
-                1.0 * y / y_length,
+                1.0 * x,
+                1.0 * y,
                 0.0
             );
             v = clamp(v, -1.0, 1.0);
-            //v = (v + 1.0) / 2.0;
+            v = (v + 1.0) / 2.0;
             //v = std::abs(v);
-            v = threshold(std::abs(v), 0.05, 0.0, 1.0);
+            //v = threshold(std::abs(v), 0.05, 0.0, 1.0);
             auto c = static_cast<uint8_t>(v * 255.0);
             image.at<cv::Vec3b>(x,y)[0] = c;
             image.at<cv::Vec3b>(x,y)[1] = c;
