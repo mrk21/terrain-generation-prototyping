@@ -76,8 +76,15 @@ namespace VoxelRenderer {
         ShaderInfo shader_info;
 
     public:
+        struct VerticesClip {
+            glm::vec3 min;
+            glm::vec3 max;
+            glm::vec3 center;
+        };
+
+        static glm::vec3 default_camera_position(const VerticesClip & clip);
         void init(GLFWwindow * window_);
-        void render(const Vertices & vertices);
+        void render(const Vertices & vertices, std::function<glm::vec3(const VerticesClip & clip)> camera_position = &Renderer::default_camera_position);
     };
 }
 

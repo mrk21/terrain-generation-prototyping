@@ -172,7 +172,15 @@ namespace VoxelRenderer {
         shader_info = builder.build();
     }
 
-    void Renderer::render(const Vertices & vertices_) {
+    glm::vec3 Renderer::default_camera_position(const VerticesClip & clip) {
+        return {
+            -std::max(20.0f, 2.0f * clip.max.x),
+            -std::max(20.0f, 2.0f * clip.max.y),
+             std::max(20.0f, 2.0f * clip.max.z)
+        };
+    }
+
+    void Renderer::render(const Vertices & vertices_, std::function<glm::vec3(const VerticesClip & clip)> camera_position) {
         auto vertices = VerticesOptimizer().optimize(vertices_);
 
         glm::vec3 min(
@@ -196,6 +204,7 @@ namespace VoxelRenderer {
         }
         auto center = (min + max) / 2.0f;
 
+        VerticesClip clip{ min, max, center };
         ShaderDataBinder binder;
         binder.create_buffer(vertices);
 
@@ -219,14 +228,10 @@ namespace VoxelRenderer {
                 10000.0f
             );
             glm::vec3 light_direction(-0.5f, -1.0f, 0.0f);
-            glm::vec3 camera_position(
-                -std::max(20.0f, 2.0f * max.x),
-                -std::max(20.0f, 2.0f * max.y),
-                 std::max(20.0f, 2.0f * max.z)
-            );
+            glm::vec3 camera_position_ = camera_position(clip);
             glm::vec3 camera_target(0.0f, 0.0f, 0.0f);
             auto view = glm::lookAt(
-                camera_position,
+                camera_position_,
                 camera_target,
                 glm::vec3(0.0f, 0.0f, 1.0f)
             );
@@ -240,7 +245,7 @@ namespace VoxelRenderer {
                 view,
                 projection,
                 light_direction,
-                camera_position,
+                camera_position_,
                 camera_target
             );
             glDrawArrays(GL_POINTS, 0, vertices.size() - 1);

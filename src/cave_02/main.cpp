@@ -62,12 +62,12 @@ struct CaveInfo {
 
 class CaveInfoGenerator {
 public:
-    static constexpr uint32_t per_chunk = 3u;
-    static constexpr uint32_t max_length = 400u;
-    static constexpr uint32_t min_length = 50u;
-    static constexpr uint32_t max_branches = 6u;
+    static constexpr uint32_t per_chunk = 5u;
+    static constexpr uint32_t max_length = 250u;
+    static constexpr uint32_t min_length = 20u;
+    static constexpr uint32_t max_branches = 4u;
     static constexpr uint32_t min_branches = 0u;
-    static constexpr uint32_t max_layer = 1u;
+    static constexpr uint32_t max_layer = 2u;
     std::vector<uint8_t> r;
 
     CaveInfoGenerator(int32_t seed) {
@@ -97,8 +97,9 @@ public:
         auto length_hash = r[h + 2];
         auto max_length_for_current_layer = max_length * std::pow(0.75, layer);
         auto min_length_for_current_layer = min_length;
+        auto depth_weight =  0.25f * (127.0f - position.z) / 127.0f;
         uint32_t length = glm::clamp(
-            (float)std::round(max_length_for_current_layer * per(length_hash)),
+            (float)std::round(max_length_for_current_layer * (per(length_hash) + depth_weight)),
             (float)min_length_for_current_layer,
             (float)max_length_for_current_layer
         );
@@ -148,6 +149,8 @@ private:
 };
 
 class CaveGenerator {
+    static constexpr auto angle_noise_unit = 300u;
+    static constexpr auto radius_noise_unit = 255u;
     static constexpr float max_w_rotation_rad = pi;
     static constexpr float max_h_rotation_rad = pi / 4.0;
 
@@ -164,21 +167,21 @@ public:
         generator(base_seed_)
     {
         angle_noise.SetSeed(base_seed + 1);
-        angle_noise.SetOctaveCount(3);
-        angle_noise.SetFrequency(2.0f / CaveInfoGenerator::max_length);
+        angle_noise.SetOctaveCount(5);
+        angle_noise.SetFrequency(2.0f / angle_noise_unit);
 
         radius_noise.SetSeed(base_seed + 2);
         radius_noise.SetOctaveCount(3);
-        radius_noise.SetFrequency(8.0f / 256.0f);
+        radius_noise.SetFrequency(8.0f / radius_noise_unit);
     }
 
-    VoxelRenderer::Vertices generate(const glm::vec2 & from, const glm::vec2 to) {
+    VoxelRenderer::Vertices generate(const glm::vec2 & chunk_from, const glm::vec2 chunk_to) {
         VoxelRenderer::Vertices vertices;
 
-        for (uint32_t x = from.x; x <= to.x; ++x) {
-            for (uint32_t y = from.y; y <= to.y; ++y) {
+        for (uint32_t x = chunk_from.x; x <= chunk_to.x; ++x) {
+            for (uint32_t y = chunk_from.y; y <= chunk_to.y; ++y) {
                 auto info = generator.make_from_chunk({ x, y });
-                generate_sub(info, vertices);
+                generate_cave(info, vertices);
             }
         }
 
@@ -186,14 +189,14 @@ public:
     }
 
 private:
-    void generate_sub(const std::optional<CaveInfo> & info, VoxelRenderer::Vertices & vertices) {
+    void generate_cave(const std::optional<CaveInfo> & info, VoxelRenderer::Vertices & vertices) {
         using namespace glm;
         using namespace GLHelpers;
         using namespace Helpers;
         if (!info) return;
 
         times(info->layer, [](auto){ std::cout << "    "; });
-        std::cout << boost::format("- %s: %s -> [%s]")
+        std::cout << boost::format("- %s => %s: [%s]")
             % to_string(info->position)
             % info->length
             % to_string(info->branch_points)
@@ -247,8 +250,8 @@ private:
             // make branches
             if (branch_points_it != branch_points_end && i == *branch_points_it) {
                 ++branch_points_it;
-                auto sub_info = generator.make_from_point(next_position, info->layer + 1);
-                generate_sub(sub_info, vertices);
+                auto branch_info = generator.make_from_point(next_position, info->layer + 1);
+                generate_cave(branch_info, vertices);
             }
 
             current_position = next_position;
@@ -303,8 +306,14 @@ int main() {
 
         std::cout << "Seed: " << seed << std::endl;
         CaveGenerator cave(seed);
-        auto vertices = cave.generate({ 0, 0 }, { 6, 6 });
-        renderer.render(vertices);
+        auto vertices = cave.generate({ 0, 0 }, { 20, 20 });
+        renderer.render(vertices, [](auto clip) {
+            return glm::vec3{
+                -2.0f * clip.max.x,
+                -2.0f * clip.max.y,
+                 4.0f * clip.max.z
+            };
+        });
     }
     catch (std::string str) {
         std::cerr << str << std::endl;
