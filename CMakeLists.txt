@@ -12,6 +12,8 @@ if(CMAKE_CXX_COMPILER_ID STREQUAL AppleClang)
   add_compile_options(-std=c++17 -stdlib=libc++ -Wall -Wextra -Wno-deprecated-declarations)
   set(CMAKE_EXE_LINKER_FLAGS -stdlib=libc++)
   set(VENDOR_CXX_FLAGS -stdlib=libc++)
+  set(CMAKE_CXX_STANDARD 17)
+  set(CMAKE_CXX_STANDARD_REQUIRED on)
 
 else()
   message(FATAL_ERROR "Unsupported compiler!")
